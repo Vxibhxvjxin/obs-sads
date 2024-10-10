@@ -97,8 +97,8 @@ def process_omr(pdf_path, images_folder_path, output_folder, answer_key, num_of_
 
         y_offset = 0
 
-        for question_idx in range(num_questions):
-            if question_idx < fixed_questions:
+        for Q_idx in range(num_questions):
+            if Q_idx < fixed_questions:
                 y1 = y_offset
                 y2 = y1 + height_per_question
                 y_offset = y2
@@ -110,11 +110,11 @@ def process_omr(pdf_path, images_folder_path, output_folder, answer_key, num_of_
             if y2 > height:
                 y2 = height
 
-            question_image = image[y1:y2, :]
-            question_filename = f"question_{start_question + question_idx}.png"
-            question_path = os.path.join(output_folder, question_filename)
-            cv2.imwrite(question_path, question_image)
-            print(f"Saved: {question_path}")
+            Q_image = image[y1:y2, :]
+            Q_filename = f"Q_{start_question + Q_idx}.png"
+            Q_path = os.path.join(output_folder, Q_filename)
+            cv2.imwrite(Q_path, Q_image)
+            print(f"Saved: {Q_path}")
 
     # Step 5: Process each image and divide them into questions
     def process_part_image(part_image_path, output_folder, start_question, end_question, height_per_question, fixed_questions=4):
@@ -169,7 +169,7 @@ def process_omr(pdf_path, images_folder_path, output_folder, answer_key, num_of_
         for idx, image_path in enumerate(image_paths):
             section = divide_and_detect_darkest_part(image_path)
             if section:
-                image_name = f"question_{idx + 1}"
+                image_name = f"Q_{idx + 1}"
                 results[image_name] = (image_path, section)
 
         return results
@@ -178,17 +178,17 @@ def process_omr(pdf_path, images_folder_path, output_folder, answer_key, num_of_
     def compare_answers_and_calculate_marks(generated_answers, answer_key, num_of_questions):
         """ Compare the generated answers with the provided answer key and calculate marks. """
         correct_answers = 0
-        question_results = {}
+        Q_results = {}
         for i in range(num_of_questions):
-            question = f"question_{i + 1}"
+            question = f"Q_{i + 1}"
             if question in generated_answers and generated_answers[question][1] == answer_key[i]:
                 correct_answers += 1
-                question_results[question] = 1
+                Q_results[question] = 1
             else:
-                question_results[question] = 0
+                Q_results[question] = 0
 
         marks = correct_answers / num_of_questions * 100
-        return correct_answers, marks, question_results
+        return correct_answers, marks, Q_results
 
     # Convert PDF to images
     pdf_to_images(pdf_path, images_folder_path)
@@ -218,17 +218,17 @@ def process_omr(pdf_path, images_folder_path, output_folder, answer_key, num_of_
                 process_part_image(part3_image_path, output_folder, start_question=11, end_question=20, height_per_question=height_per_question)
 
                 # Process multiple images for darkest detection
-                image_paths = [os.path.join(output_folder, f"question_{i}.png") for i in range(1, 21)]
+                image_paths = [os.path.join(output_folder, f"Q_{i}.png") for i in range(1, 21)]
                 generated_answers = process_multiple_images(image_paths)
 
                 # Compare the generated answers with the provided answer key and calculate marks
-                correct_answers, marks, question_results = compare_answers_and_calculate_marks(generated_answers, answer_key, num_of_questions)
+                correct_answers, marks, Q_results = compare_answers_and_calculate_marks(generated_answers, answer_key, num_of_questions)
 
                 # Store the results
                 result_entry = {
                     'image_name': image_file
                 }
-                result_entry.update(question_results)
+                result_entry.update(Q_results)
                 result_entry.update({
                     'correct_answers': f"{correct_answers} out of {num_of_questions}",
                     'marks': marks
