@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify 
 import os
 import pandas as pd
 from pymongo import MongoClient  # MongoDB connection
@@ -47,7 +47,6 @@ def login():
         error = "Invalid credentials, please try again."
         return render_template('welcomeLogin.html', error=error)
 
-# OMR form and processing routes
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_form():
     if not session.get('logged_in'):
@@ -56,14 +55,18 @@ def upload_form():
     if request.method == 'POST':
         teacher_name = request.form['teacher_name']
         subject = request.form['subject']
-        answer_key = request.form['answer_key'].split(',')
         num_of_questions = int(request.form['num_of_questions'])
+        answer_key = request.form['answer_key'].split(',')
+
+        # Validate if the length of the answer key matches the number of questions
+        if len(answer_key) != num_of_questions:
+            error_message = f"Error: The number of answers ({len(answer_key)}) does not match the number of questions ({num_of_questions})."
+            return jsonify({'error': error_message})  # Send error back to frontend
 
         uploaded_file = request.files['pdf_file']
         if uploaded_file.filename != '':
             pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
             uploaded_file.save(pdf_path)
-            print(f"Uploaded PDF saved to: {pdf_path}")  # Debugging line
 
             try:
                 # Process OMR
@@ -76,8 +79,7 @@ def upload_form():
                 )
                 return redirect(url_for('results'))
             except Exception as e:
-                print(f"An error occurred during processing: {e}")
-                return "<h1>Error processing the OMR sheet. Check the server logs for more information.</h1>"
+                return jsonify({'error': f"An error occurred during processing: {e}"})  # Send error to frontend
     
     return render_template('index.html')
 
