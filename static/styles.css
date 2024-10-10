@@ -7,7 +7,7 @@ body {
     justify-content: center;
     align-items: center;
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(45deg, #00aaff, #00ffaa, #ffaa00, #ff00aa, #aa00ff);
+    background: linear-gradient(45deg, #00aaff, #4caedb, #3486bd, #14599b, #2600ff);
     background-size: 300% 300%;
     animation: gradientMove 15s ease infinite;
 }
