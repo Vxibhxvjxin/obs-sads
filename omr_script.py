@@ -255,11 +255,11 @@ if __name__ == "__main__":
     # Input subject from user
     subject = input("Enter the name of the subject :")
 
-    # Input answer key from user
-    answer_key = input("Enter the answer key as comma-separated values (e.g., A,B,C,D,...): ").split(',')
-
     # Input number of questions to check
     num_of_questions = int(input("Enter the number of questions to check: "))
+
+    # Input answer key from user
+    answer_key = input("Enter the answer key as comma-separated values (e.g., A,B,C,D,...): ").split(',')
 
     # Call the merged function
     process_omr(pdf_path, images_folder_path, output_folder, answer_key, num_of_questions)
