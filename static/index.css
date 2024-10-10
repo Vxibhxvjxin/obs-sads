@@ -9,7 +9,7 @@ body {
 /* Gradient Background */
 .gradient-bg {
     min-height: 100vh; /* Ensure full height */
-    background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
+    background: (-45deg, #00aaff, #4caedb, #3486bd, #14599b, #2600ff);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     display: flex;
